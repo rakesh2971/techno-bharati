@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Event Registration</title>
+    <style>
+      .container {
+        max-width: 400px;
+        margin: auto;
+        text-align: center;
+      }
+      input,
+      button {
+        display: block;
+        width: 100%;
+        margin: 10px 0;
+        padding: 10px;
+      }
+      #message {
+        margin-top: 10px;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Event Registration</h2>
+      <form id="registrationForm">
+        <input
+          type="text"
+          name="name"
+          id="name"
+          placeholder="Your Name"
+          required
+        />
+        <input
+          type="email"
+          name="email"
+          id="email"
+          placeholder="Your Email"
+          required
+        />
+        <input
+          type="text"
+          name="event"
+          id="event"
+          placeholder="Event Name"
+          required
+        />
+        <input
+          type="file"
+          name="payment_screenshot"
+          id="paymentScreenshot"
+          required
+        />
+        <button type="submit">Register</button>
+      </form>
+      <p id="message"></p>
+    </div>
+
+    <script>
+      document
+        .getElementById("registrationForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const formData = new FormData();
+          formData.append("name", document.getElementById("name").value);
+          formData.append("email", document.getElementById("email").value);
+          formData.append("event", document.getElementById("event").value);
+          formData.append(
+            "payment_screenshot",
+            document.getElementById("paymentScreenshot").files[0]
+          );
+
+          try {
+            const response = await fetch(
+              "http://localhost:5000/api/participants",
+              {
+                method: "POST",
+                body: formData,
+              }
+            );
+
+            const data = await response.json();
+            if (response.ok) {
+              showMessage("✅ Registration successful!", "green");
+            } else {
+              showMessage("❌ " + data.error, "red");
+            }
+          } catch (error) {
+            showMessage("❌ Network error: " + error.message, "red");
+          }
+        });
+
+      function showMessage(text, color) {
+        const msgDiv = document.getElementById("message");
+        msgDiv.textContent = text;
+        msgDiv.style.color = color;
+      }
+    </script>
+  </body>
+</html>
